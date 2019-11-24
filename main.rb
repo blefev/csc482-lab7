@@ -3,14 +3,17 @@ require_relative 'tests'
 require 'securerandom'
 require 'benchmark'
 
-MAX_N = 1000
+MAX_N = 8192
 FUNCTIONS = %w(lcs lcsDP)
 
 
 def benchmark_function(function_name)
+  File.open("output/" + function_name, 'w') { |f| f.truncate(0) }
+
+
   puts "#{function_name}"
 
-  sub_trials = 10
+  sub_trials = 4
 
   unless Dir.exists? "output"
     Dir.mkdir "output"
@@ -22,16 +25,16 @@ def benchmark_function(function_name)
 
     prev = 0
 
-    0.upto(MAX_N) do |n|
+    n = 1
+    while (n < MAX_N)
+      puts "Trial #{n}"
       sum = 0
       sub_trials.times.map do
-        puts "#{n} trial #{function_name}"
+        print "."
 
         # generate random strings of size n
         s1 = SecureRandom.alphanumeric(n)
         s2 = SecureRandom.alphanumeric(n)
-
-        puts "s1: #{s1} , s2: #{s2}"
 
         # benchmark the time it takes to perform funciton
         bm = Benchmark.realtime do |b|
@@ -40,19 +43,22 @@ def benchmark_function(function_name)
 
         sum += bm
       end
+      puts
 
       avg = sum / sub_trials
 
       if prev != 0
         dbl_ratio = avg / prev
-        puts "Doubling time: #{dbl_ratio}"
-        puts
+        #puts "Doubling time: #{dbl_ratio}"
+        #puts
       end
 
-      File.open("output/" + function_name, 'a') { f.puts("#{n}\t#{avg}\t#{dbl_ratio}") }
-      puts("#{n},\t#{avg}\t#{dbl_ratio},")
+      File.open("output/" + function_name, 'a') { |f| f.puts("#{n}\t#{avg}\t#{dbl_ratio}") }
+      #puts("#{n},\t#{avg}\t#{dbl_ratio},")
 
       prev = avg
+
+      n *= 2
     end
 
 
@@ -60,11 +66,6 @@ def benchmark_function(function_name)
 end
 
 def main
-=begin
-  SORTING_FUNCTIONS.each do |function_name|
-    benchmark_function(function_name, true)
-  end
-=end
 
   FUNCTIONS.each do |func_name|
     puts func_name
@@ -75,8 +76,5 @@ def main
 end
 
 
-#puts lcs("abc", "abcx")
-#puts lcs("abcx", "abc")
-#puts lcs("a", "a")
 test_everything
-#main
+main
