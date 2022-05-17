@@ -1,5 +1,5 @@
 # Longest Common Subsequence
-Longest common subsequently algorithms made with ruby.
+Longest common subsequence algorithms made with ruby.
 
 Running:
 `ruby main.rb`
